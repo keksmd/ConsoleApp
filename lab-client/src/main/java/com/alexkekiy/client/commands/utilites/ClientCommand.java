@@ -12,20 +12,17 @@ import static com.alexkekiy.client.main.Main.continuingAccount;
 public abstract class ClientCommand extends Command {
 
     public ClientCommand(String v, String[] args) {
-        super(args,v);
+        super(args, v);
     }
-
 
     /**
      * общий для всех классов-комманд,являющихся наследниками {@link ClientCommand}
      * метод,оборачивающий команду в запрос
      */
-    public Request createRequest(){
+    public Request createRequest() {
         Request request = new Request();
         request.setCommandToExecute(this);
         this.setUser(continuingAccount);
         return request;
     }
-
-
 }

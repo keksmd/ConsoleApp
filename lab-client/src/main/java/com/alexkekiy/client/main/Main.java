@@ -26,29 +26,29 @@ import static com.alexkekiy.common.utilites.CheckingReader.validateInput;
 
 
 public class Main {
-    private static CommandMapper commandMapper;
-    public static Account continuingAccount;
     private static final Context ctx = new Context(new Scanner(System.in));
     private final static ClientCommand exit = new NoArgumented();
-    static{
+    private final static Set<String> wasExecuted = new HashSet<>();
+    public static Account continuingAccount;
+    public static boolean flag = true;
+    static SocketChannel socketChannel;
+    private static CommandMapper commandMapper;
+
+    static {
         exit.setName("exit");
     }
+
     private Main() {
     }
-    private final static Set<String> wasExecuted = new HashSet<>();
 
     public static Set<String> getWasExecuted() {
         return wasExecuted;
     }
-    static SocketChannel socketChannel;
 
-    public static boolean flag = true;
-
-    private  static void setConnection(){
+    private static void setConnection() {
         boolean flag = true;
         while (flag) {
             InetSocketAddress socketAddress = new InetSocketAddress("localhost", 8081);
-
             try {
                 flag = false;
                 //InetSocketAddress  socketAddress = new InetSocketAddress(InetAddress.getByName("helios.cs.ifmo.ru"),8081);
@@ -64,10 +64,9 @@ public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         continuingAccount = Account.getCommonAcc();
-
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                sendRequest(socketChannel,exit.createRequest());
+                sendRequest(socketChannel, exit.createRequest());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -81,12 +80,10 @@ public class Main {
         Selector selector = Selector.open();
         ReadingThread readingThread = new ReadingThread(selector);
         readingThread.start();
-
         socketChannel.register(selector, SelectionKey.OP_READ + SelectionKey.OP_WRITE);
 
         while (true) {
-
-            while(flag){
+            while (flag) {
                 try {
                     if (System.in.available() > 0) {
                         executeNext(ctx.getScanner());
@@ -102,10 +99,9 @@ public class Main {
     }
 
     private static void setAccount() throws IOException {
-            boolean flag = false;
-            while (!flag) {
-                try {
-
+        boolean flag = false;
+        while (!flag) {
+            try {
                 if ((Boolean) validateInput("b", "", "Вы уже зарегистрированы?", new Scanner(System.in))) {
                     String login = (String) validateInput("s", "Введите логин", new Scanner(System.in));
                     String pswd = PasswordCryptography.encodePassword((String) validateInput("s", "Введите пароль", new Scanner(System.in)));
@@ -116,11 +112,11 @@ public class Main {
                     ClientMessaging.sendRequest(socketChannel, r);
                     if (readResponse(socketChannel).isSuccess()) {
                         flag = true;
-                        continuingAccount = new Account(login,pswd);
+                        continuingAccount = new Account(login, pswd);
                         return;
                     }
                 } else {
-                    String login = (String)validateInput("s", "Введите логин", new Scanner(System.in));
+                    String login = (String) validateInput("s", "Введите логин", new Scanner(System.in));
                     String pswd = PasswordCryptography.encodePassword((String) validateInput("s", "Введите пароль", new Scanner(System.in)));
                     ValueArgumented v = new ValueArgumented(login + ";" + pswd);
                     v.setName("register");
@@ -133,23 +129,20 @@ public class Main {
                         return;
                     }
                 }
-            } catch(MessageWasNotReadedSuccessfull ignored){
+            } catch (MessageWasNotReadedSuccessfull ignored) {
             }
         }
 
     }
-    public static void executeNext(Scanner s) throws IOException{
+
+    public static void executeNext(Scanner s) throws IOException {
         Request req = commandMapper.extractCommand(s.nextLine(), ctx).createRequest();
         if (!(req.getCommandToExecute() instanceof NotFound)) {
             req.addMessage(req.getCommandToExecute().getName());
             req.getCommandToExecute().setUser(continuingAccount);
             sendRequest(socketChannel, req);
-        } else{
+        } else {
             throw new NotFoundedCommand();
         }
     }
-
-
-
-
 }

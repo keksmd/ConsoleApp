@@ -15,17 +15,21 @@ import org.jetbrains.annotations.NotNull;
 public class DataBaseManager {
     private static DataBaseManager inst;
     private static SpaceMarineRepository spaceMarineRepository = SpaceMarineRepository.getSpaceMarineRepository();
-    public DataBaseManager getDatabaseManager(){
-        return inst==null ? inst = new DataBaseManager() : inst;
+
+    public DataBaseManager getDatabaseManager() {
+        return inst == null ? inst = new DataBaseManager() : inst;
     }
-    public void updateSpaceMarine( @NotNull SpaceMarine spm, String[] args){
+
+    public void updateSpaceMarine(@NotNull SpaceMarine spm, String[] args) {
         spm.update(args);
         spaceMarineRepository.update(spm);
 
     }
+
     public void add(SpaceMarine spm) {
         spaceMarineRepository.add(spm);
     }
+
     public void removeById(int id) {
         spaceMarineRepository.get(id).ifPresent(spm -> spaceMarineRepository.remove(spm));
     }

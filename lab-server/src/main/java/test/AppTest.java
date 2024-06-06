@@ -17,15 +17,17 @@ import static org.junit.Assert.assertTrue;
 
 public class AppTest {
     private EntityManager em;
+
     @Before
     public void init() {
-        EntityManagerFactory emf = Persistence.createEntityManagerFactory( "local" );
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("local");
         em = emf.createEntityManager();
         em.getTransaction().begin();
     }
+
     @Test
     public void shouldPersistSpaceMarine() {
-        SpaceMarine spm = new SpaceMarine("sp",new Coordinates(1L,0.0f), 3L,true,5f, Weapon.COMBI_PLASMA_GUN,new Chapter("biba","boba"));
+        SpaceMarine spm = new SpaceMarine("sp", new Coordinates(1L, 0.0f), 3L, true, 5f, Weapon.COMBI_PLASMA_GUN, new Chapter("biba", "boba"));
         em.persist(spm);
         assertTrue(em.contains(spm));
         em.detach(spm);

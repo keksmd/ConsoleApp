@@ -11,10 +11,8 @@ import lombok.Setter;
  */
 public class Request extends Message {
     private Command commandToExecute;
-
-
     public Response calling() throws NoAccountFounded {
-        return commandToExecute.calling(this.commandToExecute.getArgs(),this.commandToExecute.getValue(),this.commandToExecute.getUser());
+        return commandToExecute.calling(this.commandToExecute.getArgs(), this.commandToExecute.getValue(), this.commandToExecute.getUser());
     }
 
 

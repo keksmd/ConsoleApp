@@ -21,7 +21,7 @@ public class RequestReader extends RecursiveAction {
     }
 
     @Override
-    protected void compute()  {
+    protected void compute() {
         Request request = null;
         try {
             request = readRequest(client.getClientChannel());
@@ -32,7 +32,7 @@ public class RequestReader extends RecursiveAction {
         }
         if (request != null) {
             System.out.println("прочитали: " + request);
-            new RequestHandler(request,client).run();
+            new RequestHandler(request, client).run();
 
         }
     }

@@ -30,9 +30,8 @@ import static com.alexkekiy.server.main.App.log;
 
 public class ClientConnector extends Thread {
     private static final ForkJoinPool pool = new ForkJoinPool();
-    final LinkedBlockingDeque<Response> responses = new LinkedBlockingDeque<>(100);
     private final static ExecutorService responseSendingPool = Executors.newFixedThreadPool(5);
-
+    final LinkedBlockingDeque<Response> responses = new LinkedBlockingDeque<>(100);
     @Setter
     @Getter
     private Selector selector;
@@ -40,7 +39,7 @@ public class ClientConnector extends Thread {
     private ClientManager clientManager;
 
     public ClientConnector(Selector selector) {
-            this.selector = selector;
+        this.selector = selector;
     }
 
     /**
@@ -48,13 +47,13 @@ public class ClientConnector extends Thread {
      * и сервер
      */
 
-    protected void setCommands(){
+    protected void setCommands() {
         this.clientManager.setFirstMessageFromClient(false);
         StringBuilder sb = new StringBuilder();
-        Stream.of(Add.class, AddIfMax.class, AddIfMin.class, Help.class, Clear.class, Enter.class, Exit.class, FilterHeight.class, GroupByWeapon.class, Info.class, PrintFieldDescendingLoyal.class, Register.class, RemoveById.class, RemoveHead.class, Save.class,Show.class, UpdateById.class).
+        Stream.of(Add.class, AddIfMax.class, AddIfMin.class, Help.class, Clear.class, Enter.class, Exit.class, FilterHeight.class, GroupByWeapon.class, Info.class, PrintFieldDescendingLoyal.class, Register.class, RemoveById.class, RemoveHead.class, Save.class, Show.class, UpdateById.class).
                 forEach(w -> {
                     try {
-                        CommandExtractor.nameToHandleMap.put(String.valueOf(w.getField("name").get(w.getConstructor().newInstance())),w.getMethod("staticFactory",String[].class,String.class));
+                        CommandExtractor.nameToHandleMap.put(String.valueOf(w.getField("name").get(w.getConstructor().newInstance())), w.getMethod("staticFactory", String[].class, String.class));
                         sb.
                                 append(w.getField("name").get(w.getConstructor().newInstance())).
                                 append(",").
@@ -67,22 +66,23 @@ public class ClientConnector extends Thread {
                     }
                 });
 
-            Response commandsResponse = new Response();
-            commandsResponse.addMessage(sb.toString());
-            responses.add(commandsResponse);
-                }
+        Response commandsResponse = new Response();
+        commandsResponse.addMessage(sb.toString());
+        responses.add(commandsResponse);
+    }
 
     /**
      * Метод,запускающий коннектор
      */
 
-    public void run()  {
+    public void run() {
         try {
             while (true) {//true
 
                 //this.getSelector().select();
-                while (this.getSelector().selectNow()==0){}
-                System.out.println("мощность итератора по селетору ="+ getSelector().selectedKeys().size());
+                while (this.getSelector().selectNow() == 0) {
+                }
+                System.out.println("мощность итератора по селетору =" + getSelector().selectedKeys().size());
                 Iterator<SelectionKey> keysIterator = this.getSelector().selectedKeys().iterator();
                 try {
                     while (keysIterator.hasNext()) {
@@ -95,7 +95,7 @@ public class ClientConnector extends Thread {
                     log.error("ошибка,сервер чуть не лег", e);
                 }
             }
-        }catch (IOException ignored){
+        } catch (IOException ignored) {
 
         }
 
@@ -103,16 +103,17 @@ public class ClientConnector extends Thread {
 
     /**
      * метод, определяющий готовность ключа к тем или иным действиям, и вызывающий методы их реализации
+     *
      * @param key обрабатываемый ключ
      * @throws IOException (пробрасывает выше) в случае ошибки при преме-передаче сообщений
      */
     private void handleKey(SelectionKey key) throws IOException {
-         if (key.isWritable()) {
+        if (key.isWritable()) {
 
             this.handleWrite();
-        }else if(key.isReadable()){
+        } else if (key.isReadable()) {
 
-             this.handleRead();
+            this.handleRead();
         }
     }
 
@@ -126,19 +127,19 @@ public class ClientConnector extends Thread {
         pool.execute(requestReader);
 
     }
+
     /**
      * метод отправки ответа
      */
     private void handleWrite() {
         try {
             Response response = this.responses.take();
-            responseSendingPool.submit(new ResponseSender(response,this));
+            responseSendingPool.submit(new ResponseSender(response, this));
 
             try {
                 this.getClientChannel().register(this.getSelector(), SelectionKey.OP_READ);
-            } catch (ClosedChannelException ignored) {}
-
-
+            } catch (ClosedChannelException ignored) {
+            }
 
 
         } catch (InterruptedException e) {
@@ -146,10 +147,7 @@ public class ClientConnector extends Thread {
         }
 
 
-
     }
-
-
 
 
     public SocketChannel getClientChannel() {

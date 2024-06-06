@@ -5,8 +5,9 @@ import lombok.Setter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-/** класс для представления передаваемых сообщений
- *
+
+/**
+ * класс для представления передаваемых сообщений
  */
 @Getter
 @Setter

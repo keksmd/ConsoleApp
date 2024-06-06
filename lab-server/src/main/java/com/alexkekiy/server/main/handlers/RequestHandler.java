@@ -22,8 +22,8 @@ public class RequestHandler implements Runnable {
     private final Request request;
     private final ClientConnector connector;
 
-    public RequestHandler(Request request,ClientConnector connector) {
-        this.connector= connector;
+    public RequestHandler(Request request, ClientConnector connector) {
+        this.connector = connector;
         this.request = request;
     }
 
@@ -37,18 +37,18 @@ public class RequestHandler implements Runnable {
                     Response response = null;
                     try {
                         request.setCommandToExecute(mapCommand(request.getCommandToExecute(), request.getMessages().get(0)));
-                        response= request.calling();
+                        response = request.calling();
                         System.out.println("calling прошел");
-                        connector.getClientManager().checkAnswer(response,request);
+                        connector.getClientManager().checkAnswer(response, request);
                     } catch (NoAccountFounded e) {
-                        response = (response==null)?new Response():response;
+                        response = (response == null) ? new Response() : response;
                         response.setSuccess(false);
                         response.setMessages(Stream.of("Аккаунт не найден").collect(Collectors.toCollection(ArrayList::new)));
                     } catch (InvalidPassword e) {
                         response.setSuccess(false);
                         response.setMessages(Stream.of("Неверный пароль").collect(Collectors.toCollection(ArrayList::new)));
                     }
-                   connector.responses.add(response);
+                    connector.responses.add(response);
                 } catch (InvocationTargetException | IllegalAccessException e) {
                     System.out.println("Ошибка: неверно реализована команда");
                     e.printStackTrace();

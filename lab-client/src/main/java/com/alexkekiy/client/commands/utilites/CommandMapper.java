@@ -17,16 +17,37 @@ import java.util.Map;
 import java.util.Scanner;
 
 import static com.alexkekiy.client.main.ClientMessaging.readResponse;
+
 /**
  * Утильный класс,который запрашивает,принимает и хранит данные для маппинга команд, а также занимается самим маппингом
- *
  */
 public class CommandMapper {
-    private CommandMapper(Map<String,CommandTypes> map) {
+    public Map<String, CommandTypes> nameToTypeMap;
+    private CommandMapper(Map<String, CommandTypes> map) {
         this.nameToTypeMap = map;
     }
 
-  public  Map<String,CommandTypes>  nameToTypeMap;
+    /**
+     * Статическая фабрика, принимающая зашифрованные имена и типы команд
+     *
+     * @param chanel канал,из которого принимаются команды
+     * @return новый объект CommandMapper-а
+     */
+    public static CommandMapper recieveCommands(SocketChannel chanel) {
+        Map<String, CommandTypes> nameToTypeMap = new HashMap<>();
+        try {
+            ClientMessaging.sendTextMessage(chanel, "commands");
+            String coded = readResponse(chanel).getMessages().get(0);
+            Arrays.stream(coded.split(";"))
+                    .forEach(w -> nameToTypeMap.
+                            put(w.split(",")[0],
+                                    CommandTypes.valueOf(w.split(",")[1])));
+        } catch (IOException | MessageWasNotReadedSuccessfull ignored) {
+            throw new RuntimeException();
+        }
+        System.out.println("доступные команды и их типы \n" + nameToTypeMap);
+        return new CommandMapper(nameToTypeMap);
+    }
 
     /**
      * Метод,определяющий команду по текстовому вводу
@@ -36,12 +57,12 @@ public class CommandMapper {
      * @return объект, реализующий команду
      */
 
-    public  ClientCommand extractCommand(String str, Context ctx) {
+    public ClientCommand extractCommand(String str, Context ctx) {
         String[] tokens = str.split(" ");
         String prefix = "";
-        for(int i = 0;i< tokens.length;i++){
-            prefix+=tokens[i];
-            if(nameToTypeMap.containsKey(prefix)){
+        for (int i = 0; i < tokens.length; i++) {
+            prefix += tokens[i];
+            if (nameToTypeMap.containsKey(prefix)) {
                 CommandTypes type = nameToTypeMap.get(prefix);
                 return switch (type) {
                     case VALUE_ARGUMENTED -> {
@@ -60,7 +81,6 @@ public class CommandMapper {
                     case WITHOUT_ARGUMENTS -> {
                         ClientCommand temp = new NoArgumented();
                         temp.setName(prefix);
-
                         yield temp;
                     }
                     case ELEMENT_ARGUMENTED -> {
@@ -82,36 +102,12 @@ public class CommandMapper {
                         } else yield new NotFound();
                     }
                 };
-            }else if (prefix.equals("execute_script")&&i< tokens.length-1){
-                new ScriptExecutor(tokens[i+1]).createRequest();
+            } else if (prefix.equals("execute_script") && i < tokens.length - 1) {
+                new ScriptExecutor(tokens[i + 1]).createRequest();
                 i++;
             }
-            prefix+=" ";
+            prefix += " ";
         }
         return new NotFound();
-
     }
-
-    /**
-     * Статическая фабрика, принимающая зашифрованные имена и типы команд
-     * @param chanel канал,из которого принимаются команды
-     * @return новый объект CommandMapper-а
-     */
-
-    public static  CommandMapper recieveCommands(SocketChannel  chanel) {
-        Map<String,CommandTypes> nameToTypeMap = new HashMap<>();
-            try {
-                ClientMessaging.sendTextMessage(chanel, "commands");
-                String coded = readResponse(chanel).getMessages().get(0);
-                Arrays.stream(coded.split(";"))
-                        .forEach(w->nameToTypeMap.
-                                put(w.split(",")[0],
-                                        CommandTypes.valueOf(w.split(",")[1])));
-            } catch (IOException | MessageWasNotReadedSuccessfull ignored) {
-                throw new RuntimeException();
-            }
-        System.out.println("доступные команды и их типы \n" + nameToTypeMap);
-            return new CommandMapper(nameToTypeMap);
-    }
-
 }

@@ -8,7 +8,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public class PasswordCryptography {
     private static final MessageDigest sha1;
-    private PasswordCryptography() {}
+
     static {
         try {
             sha1 = MessageDigest.getInstance("SHA-1");
@@ -16,8 +16,12 @@ public class PasswordCryptography {
             throw new RuntimeException(e);
         }
     }
+
+    private PasswordCryptography() {
+    }
+
     public static String encodePassword(String password) {
-        return  new String(sha1.digest(password.getBytes()));
+        return new String(sha1.digest(password.getBytes()));
 
     }
 

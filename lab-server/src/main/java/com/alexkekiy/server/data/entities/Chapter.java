@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+
 @Setter
 @Getter
 @Entity
@@ -23,8 +24,10 @@ public class Chapter {
         name = n;
         this.parentLegion = "";
     }
+
     public Chapter() {
     }
+
     @Override
     public boolean equals(Object obj) {
         boolean answ = true;

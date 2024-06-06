@@ -2,7 +2,6 @@
  * Класс,(вызвавши много жопной боли у разработчика),метод {@link utilites.CheckingReader#checkyRead(String, String, String, String)} которого
  * считывает аргументы команд,анализирует и принимает решение,использовать их,передав далее по цепочке
  * или запросить заново в связи с ошибкой ввода
- *
  */
 package com.alexkekiy.common.utilites;
 
@@ -16,14 +15,15 @@ import java.util.function.Supplier;
 public final class CheckingReader {
     private CheckingReader() {
 
-    };
-    public static String[] readSomeArgs(int number, String[] types, Scanner input, String[] comments, String[] predicates){
-        ArrayList < String >  args = new ArrayList < > ();
-        for (int i = 0;i<number;i++){
+    }
+
+    public static String[] readSomeArgs(int number, String[] types, Scanner input, String[] comments, String[] predicates) {
+        ArrayList<String> args = new ArrayList<>();
+        for (int i = 0; i < number; i++) {
             args.add(String.valueOf(validateInput(types[i], predicates[i], comments[i], input)));
 
         }
-        return  args.toArray(String[]::new);
+        return args.toArray(String[]::new);
 
     }
 
@@ -38,9 +38,9 @@ public final class CheckingReader {
      */
 
 
-    public static Object validateInput(String type, String predicate, String comment, Scanner sc)  {
+    public static Object validateInput(String type, String predicate, String comment, Scanner sc) {
         if (!comment.isEmpty()) {
-               System.out.println(comment);
+            System.out.println(comment);
         }
         Supplier<?> append;
         Object o = null;
@@ -72,9 +72,7 @@ public final class CheckingReader {
                 return o;
             }
 
-        }catch(NoSuchElementException e){
-            //System.out.printf("checkyRead(type = %s, predicate = %s,comment = %s,input = %s)%n",type,predicate, comment, o);
-
+        } catch (NoSuchElementException e) {
             return validateInput(type, predicate, ("Вы ошиблись,еще раз\n" + comment).replace("Вы ошиблись,еще раз\nВы ошиблись,еще раз\n", "Вы ошиблись,еще раз\n"), new Scanner(System.in));
         }
 
@@ -92,24 +90,21 @@ public final class CheckingReader {
 
         String[] words = predicate.split(" ");
         boolean right = true;
-        if(predicate.isEmpty()) return true;
+        if (predicate.isEmpty()) return true;
         String pred0 = null;
-        String pred1=null;
-        String pred2=null;
-        switch (words.length){
-            case 1:
-            {
+        String pred1 = null;
+        String pred2 = null;
+        switch (words.length) {
+            case 1: {
                 pred0 = words[0].strip();
                 break;
             }
-            case 2:
-            {
+            case 2: {
                 pred0 = words[0].strip();
                 pred1 = words[1].strip();
                 break;
             }
-            case 3:
-            {
+            case 3: {
                 pred0 = words[0].strip();
                 pred1 = words[1].strip();
                 pred2 = words[2].strip();
@@ -125,14 +120,14 @@ public final class CheckingReader {
                 if (words.length == 3) {
 
                     switch (pred0) {
-                        
+
                         case "more":
                             if (pred1.equals("than") && (new Scanner(pred2).hasNextInt() || new Scanner(pred2).hasNextLong())) {
                                 if ((Long) o < new Scanner(pred2).nextLong()) {
                                     right = false;
                                 }
                             } else {
-                                Arrays.stream(words).forEach(w->System.out.print(w+", "));
+                                Arrays.stream(words).forEach(w -> System.out.print(w + ", "));
                                 System.out.println();
                                 throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead1");
                             }
@@ -143,31 +138,33 @@ public final class CheckingReader {
                                     right = false;
                                 }
                             } else {
-                                Arrays.stream(words).forEach(w->System.out.print(w+", "));
+                                Arrays.stream(words).forEach(w -> System.out.print(w + ", "));
                                 System.out.println();
                                 throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead2");
                             }
                             break;
                         default:
-                            Arrays.stream(words).forEach(w->System.out.print(w+", "));
+                            Arrays.stream(words).forEach(w -> System.out.print(w + ", "));
                             System.out.println();
                             throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead2");
-                    }} else {
-                    Arrays.stream(words).forEach(w->System.out.print(w+", "));
+                    }
+                } else {
+                    Arrays.stream(words).forEach(w -> System.out.print(w + ", "));
                     System.out.println();
-                    throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead3");}
+                    throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead3");
                 }
+            }
             case "f" -> {
                 if (words.length == 3) {
                     switch (pred0) {
                         case "more":
-                            if (pred1.equals("than") &&( (new Scanner(pred2).hasNextFloat()))||new Scanner(pred2).hasNextDouble()) {
+                            if (pred1.equals("than") && ((new Scanner(pred2).hasNextFloat())) || new Scanner(pred2).hasNextDouble()) {
                                 if ((Float) o < new Scanner(pred2).nextFloat()) {
                                     right = false;
                                 }
                             } else {
-                                System.out.printf("хуево вызвал проверку,proove(type,uslovie,obj),predicate=%s, words = %n",predicate);
-                                Arrays.stream(words).forEach(w->System.out.print(w+", "));
+                                System.out.printf("хуево вызвал проверку,proove(type,uslovie,obj),predicate=%s, words = %n", predicate);
+                                Arrays.stream(words).forEach(w -> System.out.print(w + ", "));
                                 System.out.println();
                                 throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead4");
                             }
@@ -175,22 +172,24 @@ public final class CheckingReader {
                         case "less":
                             if (pred1.equals("than") && (new Scanner(pred2).hasNextFloat())) {
                                 if ((Float) o >= new Scanner(pred2).nextFloat()) {
-                                    right = false;}
+                                    right = false;
+                                }
                             } else {
-                                Arrays.stream(words).forEach(w->System.out.print(w+", "));
+                                Arrays.stream(words).forEach(w -> System.out.print(w + ", "));
                                 System.out.println();
                                 throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead5");
                             }
                             break;
                         default:
-                            Arrays.stream(words).forEach(w->System.out.print(w+", "));
+                            Arrays.stream(words).forEach(w -> System.out.print(w + ", "));
                             System.out.println();
                             throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead6");
                     }
                 } else {
                     Arrays.stream(words).forEach(System.out::print);
                     System.out.println();
-                    throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead7");}
+                    throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead7");
+                }
             }
             case "s" -> {
                 if (words.length == 3) {
@@ -201,7 +200,7 @@ public final class CheckingReader {
                                     right = false;
                                 }
                             } else {
-                                Arrays.stream(words).forEach(w->System.out.print(w+", "));
+                                Arrays.stream(words).forEach(w -> System.out.print(w + ", "));
                                 System.out.println();
                                 throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead8");
                             }
@@ -212,17 +211,17 @@ public final class CheckingReader {
                                     right = false;
                                 }
                             } else {
-                                Arrays.stream(words).forEach(w->System.out.print(w+", "));
+                                Arrays.stream(words).forEach(w -> System.out.print(w + ", "));
                                 System.out.println();
                                 throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead9");
                             }
                             break;
                         default:
-                            Arrays.stream(words).forEach(w->System.out.print(w+", "));
+                            Arrays.stream(words).forEach(w -> System.out.print(w + ", "));
                             System.out.println();
                             throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead10");
                     }
-                } else if(words.length == 2){
+                } else if (words.length == 2) {
                     if (pred0.equals("is")) {
                         if (Objects.equals(pred1, "weapon")) {
                             if (!o.equals("BOLT_PISTOL") && !o.equals("INFERNO_PISTOL") && !o.equals("MULTI_MELTA") && !o.equals("COMBI_PLASMA_GUN") && !o.equals("GRENADE_LAUNCHER")) {
@@ -234,8 +233,8 @@ public final class CheckingReader {
                             throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead10");
                         }
                     }
-                }else{
-                    Arrays.stream(words).forEach(w->System.out.print(w+", "));
+                } else {
+                    Arrays.stream(words).forEach(w -> System.out.print(w + ", "));
                     System.out.println();
                     throw new IncorrectCommandUsing("Syntax error in proove \n in checkyRead11");
                 }
@@ -250,7 +249,7 @@ public final class CheckingReader {
     }
 
     public static Object validateInput(String type, String comment, Scanner input) {
-        return  validateInput(type,"",comment,input);
+        return validateInput(type, "", comment, input);
     }
 
     public static Object readValidType(String type, String input) {

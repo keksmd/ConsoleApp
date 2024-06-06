@@ -19,7 +19,7 @@ public final class ClientMessaging {
         int readed = clientChannel.read(buf);
         if (readed > 0) {
             buf.flip();
-            String s = new String(ByteBuffer.allocate(readed).put(buf.array(),0,readed).array()) ;
+            String s = new String(ByteBuffer.allocate(readed).put(buf.array(), 0, readed).array());
             return JsonSerializer.deserialize(s, new TypeReference<>() {
 
             });
@@ -27,9 +27,9 @@ public final class ClientMessaging {
             throw new MessageWasNotReadedSuccessfull();
         }
     }
+
     public static void sendTextMessage(SocketChannel clientChannel, String message) throws IOException {
         Request req = new Request();
-        //req.setUser(Account.getCommonAcc());
         req.addMessage(message);
         String json = JsonSerializer.toJson(req);
         ByteBuffer buf = ByteBuffer.allocate(json.getBytes().length).put(json.getBytes());
@@ -39,6 +39,7 @@ public final class ClientMessaging {
         }
         System.out.println("sended " + json);
     }
+
     public static void sendRequest(SocketChannel clientChannel, Request req) throws IOException {
         String message = JsonSerializer.toJson(req);
         ByteBuffer buf = ByteBuffer.allocate(message.getBytes().length).put(message.getBytes());

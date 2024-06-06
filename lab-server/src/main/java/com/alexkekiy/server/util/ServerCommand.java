@@ -20,42 +20,21 @@ import java.util.Optional;
 import static com.alexkekiy.common.utilites.JsonSerializer.toJson;
 
 /**
- *
  * реализация команды на сервере,аккаунт для исполнения у которой должен быть синхронизирован с бд
  */
 @Setter
-public class ServerCommand extends Command{
+public class ServerCommand extends Command {
+    public CommandType commandType;
+    private ServerAccount user;
 
-
-
-
-    public Response calling(String[] a, String v, Account user){
-        return super.calling(a,v,user);
-    }
-    public Response calling(){
-        return super.calling();
-    }
     public ServerCommand() {
     }
-    public CommandType commandType;
 
     public ServerCommand(String[] args, String value) {
         super(args, value);
     }
-    private ServerAccount user;
 
-    @Override
-    public ServerAccount getUser() {
-        return user;
-    }
-
-
-
-
-
-
-
-    public static ServerCommand castInto(ServerCommand command1,Command command) {
+    public static ServerCommand castInto(ServerCommand command1, Command command) {
         ServerCommand answer;
         try {
             answer = command1.getClass().getConstructor().newInstance();
@@ -64,10 +43,10 @@ public class ServerCommand extends Command{
             answer.setValue(command.getValue());
             System.out.println(toJson(command.getUser()));
             Optional<ServerAccount> optionalServerAccount = ServerAccountRepository.getServerAccountRepository().get(command.getUser().getLogin());
-            if(optionalServerAccount.isPresent()){
+            if (optionalServerAccount.isPresent()) {
                 answer.setUser(optionalServerAccount.get());
-            }else{
-                System.out.println("не нашлось ни одного пользователя с именем "+command.getUser().getLogin());
+            } else {
+                System.out.println("не нашлось ни одного пользователя с именем " + command.getUser().getLogin());
                 throw new NoAccountFounded();
             }
 
@@ -76,5 +55,18 @@ public class ServerCommand extends Command{
             throw new RuntimeException(e);
         }
         return answer;
+    }
+
+    public Response calling(String[] a, String v, Account user) {
+        return super.calling(a, v, user);
+    }
+
+    public Response calling() {
+        return super.calling();
+    }
+
+    @Override
+    public ServerAccount getUser() {
+        return user;
     }
 }

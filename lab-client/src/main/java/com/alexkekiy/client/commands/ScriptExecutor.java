@@ -12,50 +12,41 @@ import java.util.Scanner;
 public class ScriptExecutor extends ClientCommand {
 
     final String fileName;
-    public ScriptExecutor(String fileName){
+    private final String name = "execute_script";
+
+    public ScriptExecutor(String fileName) {
         super(null, null);
         this.fileName = fileName;
-
     }
-
-
-    private final String name = "execute_script";
 
     public String getFileName() {
         return fileName;
     }
 
-    public Request createRequest(){
+    public Request createRequest() {
         Request resp = super.createRequest();
         File file = new File(fileName);
-        if(file.exists()){
-            if (!Main.getWasExecuted().add(fileName)){
+        if (file.exists()) {
+            if (!Main.getWasExecuted().add(fileName)) {
                 System.out.println("Рекурсия была проинорирована");
-            }else {
+            } else {
                 Scanner fileContentScanner;
                 try {
                     fileContentScanner = new Scanner(file);
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
                 }
-
-
                 while (fileContentScanner.hasNextLine()) {
-                     try {
-                    Main.executeNext(fileContentScanner);
+                    try {
+                        Main.executeNext(fileContentScanner);
                     } catch (IOException ignored) {
-
                     }
                 }
             }
-
             return resp;
-
-        }else{
+        } else {
             System.out.println("There is no file with choosen name");
             return resp;
         }
     }
-
-
 }

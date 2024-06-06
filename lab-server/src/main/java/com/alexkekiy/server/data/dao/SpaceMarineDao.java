@@ -11,6 +11,10 @@ import java.util.Optional;
 
 public class SpaceMarineDao implements Dao<SpaceMarine> {
     private final EntityManager em;
+    private final CriteriaBuilder cb;
+    private final CriteriaQuery<SpaceMarine> query;
+    private final Root<SpaceMarine> root;
+
     public SpaceMarineDao(EntityManager em) {
         this.em = em;
 
@@ -18,24 +22,21 @@ public class SpaceMarineDao implements Dao<SpaceMarine> {
         query = cb.createQuery(SpaceMarine.class);
         root = query.from(SpaceMarine.class);
 
-}
-private final CriteriaBuilder cb ;
-private final CriteriaQuery<SpaceMarine> query ;
-private final Root<SpaceMarine> root;
+    }
 
-
-    public List<SpaceMarine> getAllByUserId(long userId){
-        try{
-            return em.createQuery(query.where(cb.equal(root.get("user_id"),userId))).getResultList();
-        }catch (Exception e){
+    public List<SpaceMarine> getAllByUserId(long userId) {
+        try {
+            return em.createQuery(query.where(cb.equal(root.get("user_id"), userId))).getResultList();
+        } catch (Exception e) {
             return List.of();
         }
     }
-    public List<SpaceMarine> getAll(){
-        try{
+
+    public List<SpaceMarine> getAll() {
+        try {
             query.select(root);
             return em.createQuery(query).getResultList();
-        }catch (Exception e){
+        } catch (Exception e) {
             return List.of();
         }
     }
@@ -44,12 +45,13 @@ private final Root<SpaceMarine> root;
     public void save(SpaceMarine spm) {
         em.persist(spm);
     }
+
     @Override
     public Optional<SpaceMarine> get(long id) {
         Optional<SpaceMarine> spm;
         try {
             spm = Optional.ofNullable(em.find(SpaceMarine.class, id));
-        }catch (Exception e){
+        } catch (Exception e) {
             spm = Optional.empty();
         }
         return spm;
@@ -57,22 +59,21 @@ private final Root<SpaceMarine> root;
 
     @Override
     public void commit() {
-        if(em.getTransaction().isActive()){
+        if (em.getTransaction().isActive()) {
             em.getTransaction().rollback();
         }
     }
 
     @Override
     public void rollback() {
-        if(em.getTransaction().isActive()){
+        if (em.getTransaction().isActive()) {
             em.getTransaction().rollback();
         }
-
     }
 
     @Override
     public void beginTransaction() {
-        if(!em.getTransaction().isActive()){
+        if (!em.getTransaction().isActive()) {
             em.getTransaction().begin();
         }
     }
@@ -81,10 +82,9 @@ private final Root<SpaceMarine> root;
     public void delete(SpaceMarine spm) {
         em.detach(spm);
     }
+
     @Override
     public void update(SpaceMarine spm) {
-            em.merge(spm);
+        em.merge(spm);
     }
-
-
 }

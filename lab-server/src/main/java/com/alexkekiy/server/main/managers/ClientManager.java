@@ -18,32 +18,31 @@ import java.util.Optional;
 @Setter
 @Getter
 public class ClientManager {
+    @Getter
+    boolean firstMessageFromClient = true;
+    SocketChannel channel;
     private ServerAccountRepository accountRepository;
-    public void checkAnswer(Response response, Request request) throws InvalidPassword, NoAccountFounded {
-        if(!request.getCommandToExecute().getUser().equals(response.getUser())){
-                Optional<ServerAccount> optServerAccount =accountRepository.get(response.getUser().getLogin());
-                if(optServerAccount.isEmpty()){
-                   throw new NoAccountFounded();
-                }else{
-                    ServerAccount serverAccount = optServerAccount.get();
-                    if(serverAccount.getPassword().equals(response.getUser().getPassword())){
-                        this.setUser(serverAccount);
-                    }else{
-                        throw new InvalidPassword();
-                    }
-                }
-        }
-    }
-
-
     private ServerAccount user;
 
     public ClientManager(SocketChannel c) {
         channel = c;
         accountRepository = ServerAccountRepository.getServerAccountRepository();
     }
-@Getter
-    boolean firstMessageFromClient = true;
-    SocketChannel channel;
+
+    public void checkAnswer(Response response, Request request) throws InvalidPassword, NoAccountFounded {
+        if (!request.getCommandToExecute().getUser().equals(response.getUser())) {
+            Optional<ServerAccount> optServerAccount = accountRepository.get(response.getUser().getLogin());
+            if (optServerAccount.isEmpty()) {
+                throw new NoAccountFounded();
+            } else {
+                ServerAccount serverAccount = optServerAccount.get();
+                if (serverAccount.getPassword().equals(response.getUser().getPassword())) {
+                    this.setUser(serverAccount);
+                } else {
+                    throw new InvalidPassword();
+                }
+            }
+        }
+    }
 
 }

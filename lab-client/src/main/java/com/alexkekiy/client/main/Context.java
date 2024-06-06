@@ -4,7 +4,8 @@ import java.util.Scanner;
 
 public class Context {
     private Scanner scanner;
-    public Context(Scanner scanner){
+
+    public Context(Scanner scanner) {
         this.scanner = scanner;
     }
 

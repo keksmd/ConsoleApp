@@ -18,11 +18,24 @@ import java.lang.reflect.Field;
 @Setter
 @Getter
 @RequiredArgsConstructor
-public abstract class Command implements Callable{
+public abstract class Command implements Callable {
+    @Setter
+    @Getter
+    Account user;
+    private String[] args;
+    private String value;
+    private String name = "command";
+
+
+    public Command(String[] args, String value) {
+        this.args = args;
+        this.value = value;
+    }
+
     /**
      * метод,реализующий взаимодействие с коллекцией
      */
-    public Response calling(String[] a, String v, Account user)  {
+    public Response calling(String[] a, String v, Account user) {
         Response resp = new Response();
         resp.setUser(user);
         this.setUser(user);
@@ -31,30 +44,10 @@ public abstract class Command implements Callable{
         resp.setSuccess(true);
         return resp;
     }
-    public  Response calling(){
-        return this.calling(this.args,this.value,this.user);
+
+    public Response calling() {
+        return this.calling(this.args, this.value, this.user);
     }
-
-    public Command(String[] args, String value) {
-        this.args = args;
-        this.value = value;
-    }
-    @Setter
-    @Getter
-    Account user;
-
-
-
-    private String[] args;
-    private String value;
-    private String name = "command";
-
-
-
-
-
-
-
 
     @Override
     public String toString() {

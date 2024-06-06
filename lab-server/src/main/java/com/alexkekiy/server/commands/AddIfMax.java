@@ -28,7 +28,7 @@ public class AddIfMax extends ServerCommand implements Callable {
 @Override
     public Response calling(String[] args, String v, Account user)  {
         Response resp = super.calling(args, v,user);
-       SpaceMarine spm = SpaceMarine.newInstance(args);
+        SpaceMarine spm = SpaceMarine.newInstance(args);
         if (spm.compareTo(Objects.requireNonNull(getCollectionManager().getCollectionStream().max(Comparator.naturalOrder()).orElse(null))) >= 0) {
             new Add().calling(args, v,user,spm);
         } else {

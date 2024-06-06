@@ -1,5 +1,6 @@
 package com.alexkekiy.server.data.entities;
 
+import com.alexkekiy.server.data.entities.util.SpaceMarineBuilder;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,14 +14,15 @@ import java.util.Objects;
 
 import static com.alexkekiy.common.utilites.CheckingReader.readValidType;
 import static java.time.LocalDateTime.now;
+
 @Setter
 @Getter
 @Entity
 @Table(name = "spacemarines")
+
 /**
  * основной хранимый entity-дата-класс
  */
-
 public class SpaceMarine implements Comparable<SpaceMarine>, Serializable {
 
     /**
@@ -33,14 +35,15 @@ public class SpaceMarine implements Comparable<SpaceMarine>, Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     @ManyToOne
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private ServerAccount user_id;
 
     /**
      * Имя {@link SpaceMarine}.
      * Поле не может быть null и не может быть пустым.
      */
-    @Column(name ="name")
+    @Column(name = "name")
+    @NotNull
     private String name;
 
     /**
@@ -48,8 +51,9 @@ public class SpaceMarine implements Comparable<SpaceMarine>, Serializable {
      * Поле не может быть null.
      */
     @OneToOne
-    @JoinColumn(name = "Coordinate_id",referencedColumnName = "id")
+    @JoinColumn(name = "Coordinate_id", referencedColumnName = "id")
     @Cascade(CascadeType.ALL)
+    @NotNull
     private Coordinates coordinates;
 
     /**
@@ -57,6 +61,7 @@ public class SpaceMarine implements Comparable<SpaceMarine>, Serializable {
      * Поле не может быть null и его значение должно генерироваться автоматически.
      * Формат даты: "dd-MM-yyyy HH:mm"
      */
+    @NotNull
     @Column
     private LocalDateTime creationDate;
 
@@ -64,13 +69,14 @@ public class SpaceMarine implements Comparable<SpaceMarine>, Serializable {
      * Уровень здоровья {@link SpaceMarine}.
      * Значение поля должно быть больше 0.
      */
-    @Column(name="health")
+    @Column(name = "health")
     private long health;
 
     /**
      * Флаг лояльности {@link SpaceMarine}.
      * Поле может быть null.
      */
+    @NotNull
     @Column
     private Boolean loyal;
 
@@ -85,6 +91,7 @@ public class SpaceMarine implements Comparable<SpaceMarine>, Serializable {
      * Поле может быть null.
      */
     @Column
+    @NotNull
     private Weapon weaponType;
 
     /**
@@ -93,27 +100,10 @@ public class SpaceMarine implements Comparable<SpaceMarine>, Serializable {
      */
 
     @OneToOne
-    @JoinColumn(name = "Chapter_id",referencedColumnName = "id")
+    @JoinColumn(name = "Chapter_id", referencedColumnName = "id")
     @Cascade(CascadeType.ALL)
     @NotNull
     private Chapter chapter;
-    public static SpaceMarine newInstance(String[] args){
-
-        return new SpaceMarine(
-                (String) readValidType("s", args[0]),
-                new Coordinates(
-                        (Long) readValidType("l", args[1]),
-                        (Float) readValidType("f", args[2])),
-                (Long) readValidType("l", args[3]),
-                (Boolean) readValidType("b", args[4]),
-                (Float) readValidType("f", args[5]),
-                Weapon.choose(
-                        (String) readValidType("s", args[6])),
-                new Chapter(
-                        (String) readValidType("s", args[7]),
-                        (String) readValidType("s", args[8])));
-
-    }
 
     public SpaceMarine(String n, Coordinates c, long h, Boolean l, float height, Weapon gun, Chapter ch) {
         super();
@@ -125,31 +115,42 @@ public class SpaceMarine implements Comparable<SpaceMarine>, Serializable {
         this.chapter = ch;
         this.height = height;
         this.creationDate = now();
-
-
     }
 
     public SpaceMarine() {
     }
 
+    public static SpaceMarine newInstance(String[] args) {
+
+        return new SpaceMarineBuilder().
+                addName((String) readValidType("s", args[0])).
+                addCoordinates(new Coordinates(
+                        (Long) readValidType("l", args[1]),
+                        (Float) readValidType("f", args[2]))).
+                addHealth((Long) readValidType("l", args[3])).
+                addLoyal((Boolean) readValidType("b", args[4])).
+                addHeight((Float) readValidType("f", args[5])).
+                addWeapoonType(Weapon.choose(
+                        (String) readValidType("s", args[6]))).
+                addChapter(new Chapter(
+                        (String) readValidType("s", args[7]),
+                        (String) readValidType("s", args[8]))).build();
+    }
+
     public SpaceMarine update(String[] args) {
-
-
-        this.name = (String) readValidType("s", args[0]);
-        this.coordinates = new Coordinates(
-                (Long) readValidType("l", args[1]),
-                (Float) readValidType("f", args[2]));
-
-        this.health = (Long) readValidType("l", args[3]);
-        this.loyal = (Boolean) readValidType("b", args[4]);
-        this.height = (Float) readValidType("f", args[5]);
-        this.weaponType = Weapon.choose(
-                (String) readValidType("s", args[6]));
-        this.chapter = new Chapter(
-                (String) readValidType("s", args[7]),
-                (String) readValidType("s", args[8]));
-
-        return this;
+        return new SpaceMarineBuilder(this).
+                addName((String) readValidType("s", args[0])).
+                addCoordinates(new Coordinates(
+                        (Long) readValidType("l", args[1]),
+                        (Float) readValidType("f", args[2]))).
+                addHealth((Long) readValidType("l", args[3])).
+                addLoyal((Boolean) readValidType("b", args[4])).
+                addHeight((Float) readValidType("f", args[5])).
+                addWeapoonType(Weapon.choose(
+                        (String) readValidType("s", args[6]))).
+                addChapter(new Chapter(
+                        (String) readValidType("s", args[7]),
+                        (String) readValidType("s", args[8]))).build();
     }
 
     @Override
@@ -184,7 +185,6 @@ public class SpaceMarine implements Comparable<SpaceMarine>, Serializable {
     public int compareTo(SpaceMarine other) {
         return this.name.compareTo(other.name);
     }
-
 
 
 }

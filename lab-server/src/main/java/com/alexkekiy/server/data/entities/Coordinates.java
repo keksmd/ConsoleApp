@@ -28,6 +28,9 @@ public class Coordinates {
         this.setY(y);
     }
 
+    public Coordinates() {
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -40,17 +43,15 @@ public class Coordinates {
         return Objects.hash(x, y, id);
     }
 
-    public Coordinates() {
-    }
-
     public void setX(Long x) {
-        if(x>=625L){
+        if (x >= 625L) {
             throw new IncorrectDataInput();
         }
-        this.x  = x;
+        this.x = x;
     }
+
     public void setY(Float y) {
-        if(y<-354F){
+        if (y < -354F) {
             throw new IncorrectDataInput();
         }
         this.y = y;

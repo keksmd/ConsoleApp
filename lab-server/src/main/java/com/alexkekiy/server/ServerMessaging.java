@@ -1,6 +1,7 @@
 package com.alexkekiy.server;
 
 
+import com.alexkekiy.common.data.Account;
 import com.alexkekiy.common.exceptions.MessageWasNotReadedSuccessfull;
 import com.alexkekiy.common.utilites.JsonSerializer;
 import com.alexkekiy.common.utilites.Request;
@@ -14,8 +15,7 @@ import java.nio.channels.SocketChannel;
 
 public final class ServerMessaging {
     private ServerMessaging() {
-
-    };
+    }
 
     public static Request readRequest(SocketChannel clientChannel) throws IOException, MessageWasNotReadedSuccessfull {
         ByteBuffer buf = ByteBuffer.allocate(clientChannel.socket().getReceiveBufferSize());
@@ -23,8 +23,6 @@ public final class ServerMessaging {
         if (readed > 0) {
             buf.flip();
             String msg = new String(buf.array());
-            //log.info("readed {} , after seserialization {}", msg, ObjectConverter.toJson(ObjectConverter.deserialize(msg, new TypeReference<>() {
-            //})));
             return JsonSerializer.deserialize(msg, new TypeReference<>() {
             });
         } else {
@@ -36,9 +34,7 @@ public final class ServerMessaging {
         Response resp = new Response();
         resp.addMessage(message);
         String json = JsonSerializer.toJson(resp);
-        //log.info("sended {}", message);
         ByteBuffer buf = ByteBuffer.allocate(json.getBytes().length).put(json.getBytes());
-
         buf = buf.flip();
         while (buf.hasRemaining()) {
             clientChannel.write(buf);
@@ -46,15 +42,13 @@ public final class ServerMessaging {
     }
 
     public static void sendResponse(SocketChannel clientChannel, Response resp) throws IOException {
+        resp.setUser(new Account(resp.getUser().getLogin(), resp.getUser().getPassword()));
         String message = JsonSerializer.toJson(resp);
-        //log.info("sended {}", message);
         ByteBuffer buf = ByteBuffer.allocate(message.getBytes().length);
-
         buf.put(message.getBytes());
         buf = buf.flip();
         while (buf.hasRemaining()) {
             clientChannel.write(buf);
         }
     }
-
 }
